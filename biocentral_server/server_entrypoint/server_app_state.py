@@ -13,6 +13,7 @@ from ..protein_analysis import protein_analysis_route
 from ..embeddings import embeddings_service_route, projection_route
 from ..biocentral import biocentral_service_route
 from ..prediction_models import prediction_models_service_route
+from ..pred import prediction_metadata_route
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +79,7 @@ class ServerAppState:
         app.register_blueprint(projection_route)
         app.register_blueprint(protein_analysis_route)
         app.register_blueprint(plm_eval_service_route)
+        app.register_blueprint(prediction_metadata_route)
 
         @app.after_request
         def apply_caching(response):
