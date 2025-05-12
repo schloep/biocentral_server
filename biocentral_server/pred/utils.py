@@ -2,11 +2,12 @@ from enum import StrEnum
 from typing import Any
 
 import numpy as np
-from google.protobuf.internal.containers import BaseContainer
 
-from biocentral_server.pred.models.base_model import BaseModel
 from models.tmbed import TMbed
 from models.light_attention import LightAttention
+from models.seth import SETH
+from models.bind_predict import BindEmbeDL
+from models.conservation import Conservation
 from pathlib import Path
 import onnxruntime as ort
 from onnxruntime.capi.onnxruntime_pybind11_state import NoSuchFile
@@ -24,7 +25,10 @@ class AvailableModels(StrEnum):
 
 MODEL_REGISTRY: dict[AvailableModels, Any] = {
     AvailableModels.TMbed: TMbed,
-    AvailableModels.LightAttention: LightAttention
+    AvailableModels.LightAttention: LightAttention,
+    AvailableModels.SETH: SETH,
+    AvailableModels.BindEmbeDL: BindEmbeDL,
+    AvailableModels.Conservation: Conservation,
 }
 MODEL_PATH = "assets/models"
 
