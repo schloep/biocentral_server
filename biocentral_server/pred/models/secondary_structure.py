@@ -28,7 +28,7 @@ class SecondaryStructure(BaseModel):
             d3_Yhat = to_cpu(torch.max(d3_Yhat, dim=-1, keepdim=True)[1]).astype(np.byte)
             d8_Yhat = to_cpu(torch.max(d8_Yhat, dim=-1, keepdim=True)[1]).astype(np.byte)
             batch_result = [{'d3_Yhat': d3_Yhat_single, 'd8_Yhat': d8_Yhat_single} for d3_Yhat_single, d8_Yhat_single in
-                            zip(d3_Yhat, d8_Yhat)]
+                            zip(list(d3_Yhat), list(d8_Yhat))]
             results.extend(batch_result)
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 

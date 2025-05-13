@@ -35,8 +35,8 @@ class TMbed(BaseModel):
                 ensemble_container = ensemble_container + softmax(np.stack(y[0]), axis=1)
             probabilities = (ensemble_container / len(self.models))
             mem_Yhat = to_cpu(self.decoder(probabilities, batch['mask'])).astype(np.byte)
-            # TODO: test if shape is B x residue_preds (also [[1,0,0,...], [...]])
-            results.extend(mem_Yhat)  # -> no batches
+            # TODO: test if shape is B x residue_preds (so [[1,0,0,...], [...]])
+            results.extend(list(mem_Yhat))  # -> no batches
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 
     def _post_process(self, model_output, embedding_ids):

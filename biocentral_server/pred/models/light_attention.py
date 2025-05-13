@@ -7,6 +7,7 @@ from .base_model import BaseModel
 
 class LightAttention(BaseModel):
     name = 'LightAttention'
+
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
         self.la_subcell = load_onnx_model(model_name='la_subcell')
@@ -46,16 +47,16 @@ class LightAttention(BaseModel):
             la_mem_Yhat = self.la_mem.run(None, batch)
             la_mem_Yhat = torch.from_numpy(np.float32(np.stack(la_mem_Yhat[0])))
             la_mem_Yhat = to_cpu(torch.max(la_mem_Yhat, dim=1)[1]).astype(np.byte)
-            batch_result = [{'subcell': subcell, 'mem': mem} for subcell, mem in zip(subcell_Yhat, la_mem_Yhat)]
+            batch_result = [{'subcell': subcell, 'mem': mem} for subcell, mem in
+                            zip(list(subcell_Yhat), list(la_mem_Yhat))]
             results.extend(batch_result)
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 
     def _post_process(self, model_output, embedding_ids):
         formatted_predictions = {}
         for i, pred in enumerate(model_output):
-            formatted_predictions[embedding_ids[i]] =  {
+            formatted_predictions[embedding_ids[i]] = {
                 'subcell': self.class2label_subcell[pred['subcell']],
                 'mem': self.class2label_mem[pred['mem']]
             }
         return formatted_predictions
-
