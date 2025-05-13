@@ -1,5 +1,4 @@
 import dataclasses
-from typing import Any
 
 from flask import request, Blueprint, jsonify
 from .metadata_endpoint import get_metadata

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import math
 from collections.abc import Sequence
-from typing import Literal
+from typing import Literal, Iterable
 import numpy as np
 import sklearn.preprocessing
 

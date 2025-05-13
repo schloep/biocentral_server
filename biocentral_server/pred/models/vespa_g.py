@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from dataclasses import dataclass
 
 from .base_model import BaseModel
 from ..utils import load_onnx_model
