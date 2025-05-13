@@ -117,7 +117,7 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='Rostlab/prot_t5_xl_uniref50'  # TODO
+        embedder='Rostlab/prot_t5_xl_uniref50'
     )
     VespaG_metadata = ModelMetadata(
         protocol=Protocol.residue_to_class,  # ?
@@ -130,7 +130,7 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='https://zenodo.org/records/11085958',
-        embedder='ESM2'
+        embedder='facebook/esm2_t36_3B_UR50D'
     )
     available_models = {
         AvailableModels.LightAttention.name: LightAttention_metadata,
