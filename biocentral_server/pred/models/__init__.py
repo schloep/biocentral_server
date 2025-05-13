@@ -4,25 +4,26 @@ from typing import Any
 from .tmbed import TMbed
 from .light_attention import LightAttention
 from .seth import SETH
-from .bind_predict import BindEmbed
+from .bind_embed import BindEmbed
 from .conservation import Conservation
 from .secondary_structure import SecondaryStructure
+from .vespa_g import VespaG
 
 class AvailableModels(StrEnum):
     TMbed = TMbed.name
     LightAttention = LightAttention.name
     Conservation = Conservation.name
     SecondaryStructure = SecondaryStructure.name
-    BindEmbeDL = BindEmbed.name
+    BindEmbed = BindEmbed.name
     SETH = SETH.name
-    VespaG = 'VespaG'
+    VespaG = VespaG.name
 
 
 MODEL_REGISTRY: dict[AvailableModels, Any] = {
     AvailableModels.TMbed: TMbed,
     AvailableModels.LightAttention: LightAttention,
     AvailableModels.SETH: SETH,
-    AvailableModels.BindEmbeDL: BindEmbed,
+    AvailableModels.BindEmbed: BindEmbed,
     AvailableModels.Conservation: Conservation,
 }
 

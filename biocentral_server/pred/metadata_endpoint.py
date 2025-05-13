@@ -93,7 +93,7 @@ def get_metadata():
         training_data_link='http://data.bioembeddings.com/public/design/',
         embedder='Rostlab/prot_t5_xl_uniref50'
     )
-    BindEmbeDL_metadata = ModelMetadata(
+    BindEmbed_metadata = ModelMetadata(
         protocol=Protocol.residue_to_class,
         description='',
         authors='Littmann, Maria and Heinzinger, Michael and Dallago, Christian and Weissenow, Konstantin and Rost, Burkhard',
@@ -137,7 +137,7 @@ def get_metadata():
         AvailableModels.TMbed.name: TMbed_metadata,
         AvailableModels.Conservation.name: Conservation_metadata,
         AvailableModels.SecondaryStructure.name: SecondaryStructure_metadata,
-        AvailableModels.BindEmbeDL.name: BindEmbeDL_metadata,
+        AvailableModels.BindEmbed.name: BindEmbed_metadata,
         AvailableModels.SETH.name: SETH_metadata,
         AvailableModels.VespaG.name: VespaG_metadata,
     }
