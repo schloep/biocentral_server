@@ -1,45 +1,11 @@
-from enum import StrEnum
-from typing import Any
-
 import numpy as np
 
-from models.tmbed import TMbed
-from models.light_attention import LightAttention
-from models.seth import SETH
-from models.bind_predict import BindEmbeDL
-from models.conservation import Conservation
+
 from pathlib import Path
 import onnxruntime as ort
 from onnxruntime.capi.onnxruntime_pybind11_state import NoSuchFile
 
-
-class AvailableModels(StrEnum):
-    TMbed = 'TMbed'
-    LightAttention = 'LightAttention'
-    Conservation = 'Conservation'
-    SecondaryStructure = 'SecondaryStructure'
-    BindEmbeDL = 'BindEmbeDL'
-    SETH = 'SETH'
-    VespaG = 'VespaG'
-
-
-MODEL_REGISTRY: dict[AvailableModels, Any] = {
-    AvailableModels.TMbed: TMbed,
-    AvailableModels.LightAttention: LightAttention,
-    AvailableModels.SETH: SETH,
-    AvailableModels.BindEmbeDL: BindEmbeDL,
-    AvailableModels.Conservation: Conservation,
-}
 MODEL_PATH = "assets/models"
-
-
-def get_model(model_name: str, batch_size):
-    model_class = MODEL_REGISTRY[AvailableModels(model_name)]
-    if not model_class:
-        raise ValueError(f'Model {model_name} not found in registry.')
-
-    return model_class(batch_size=batch_size)
-
 
 def load_multiple_onnx_models(model_name):
     models = []
@@ -55,7 +21,7 @@ def load_multiple_onnx_models(model_name):
 
 
 def load_onnx_model(model_name):
-    model_dir = f"{MODEL_PATH}/{model_name.str.lower()}"
+    model_dir = f"{MODEL_PATH}/{model_name.lower()}/{model_name.lower()}.onnx"  # TODO
     return ort.InferenceSession(model_dir)
 
 
@@ -68,6 +34,7 @@ def to_cpu(tensor):
 
 def get_batched_data(batch_size: int, data: np.array, mask: bool = False):
     batched_data = []
+    data = list(data)
     if mask:
         for i in range(0, len(data), batch_size):
             batch_data = data[i:i + batch_size]
@@ -109,4 +76,4 @@ def pad_embeddings(embeddings: np.array, get_attention_mask: bool = False):
         attention_masks_numpy = np.float32(np.stack(attention_masks))
         return padded_embeddings, attention_masks_numpy
     else:
-        return padded_embeddings
+        return padded_embeddings  # TODO Only one kind of return value

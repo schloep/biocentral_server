@@ -2,16 +2,14 @@ import dataclasses
 from typing import Any
 
 from flask import request, Blueprint, jsonify
-from metadata_endpoint import get_metadata
-from prediction_task import PredictionTask
-from multi_prediction_task import MultiPredictionTask
+from .metadata_endpoint import get_metadata
+from .multi_prediction_task import MultiPredictionTask
 from ..server_management import TaskManager
 
-prediction_service_route = Blueprint("prediction_service", __name__)
-
+prediction_service_route = Blueprint("predict_rout", __name__)  # TODO
 
 # Endpoint for ProtSpace dimensionality reduction methods for sequences
-@prediction_service_route.route('/prediction_service/predict', methods=['GET'])
+@prediction_service_route.route('/prediction_service/predict', methods=['POST'])
 def predict():
     request_data = PredictionRequestData(**request.get_json())
     model_names = request_data.model_names

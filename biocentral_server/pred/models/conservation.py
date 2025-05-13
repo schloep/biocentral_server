@@ -1,15 +1,16 @@
 import torch
 import numpy as np
 
-from src.biotrainer.biotrainer.utilities import get_device
-from ..utils import load_onnx_model, to_cpu, AvailableModels, get_batched_data
-from base_model import BaseModel
+from biotrainer.utilities import get_device
+from ..utils import load_onnx_model, to_cpu, get_batched_data
+from .base_model import BaseModel
 
 
 class Conservation(BaseModel):
+    name = 'conservation'
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
-        self.model = load_onnx_model(model_name=AvailableModels.Conservation.value())
+        self.model = load_onnx_model(model_name=self.name)
         self.device = get_device()
 
     def _prepare_inputs(self, embeddings):

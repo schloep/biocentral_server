@@ -1,10 +1,8 @@
 import torch
 import numpy as np
 
-from ..utils import to_cpu, get_batched_data
-from base_model import BaseModel
-from ..utils import load_onnx_model
-from ..metadata_endpoint import get_metadata
+from ..utils import to_cpu, get_batched_data, load_onnx_model
+from .base_model import BaseModel
 
 
 class LightAttention(BaseModel):
@@ -13,7 +11,7 @@ class LightAttention(BaseModel):
         self.la_subcell = load_onnx_model(model_name='la_subcell')
         self.la_mem = load_onnx_model(model_name='la')
         self.device = ""
-        self.embedder_name = get_metadata()['LightAttention']['embedder']
+        self.embedder_name = "Rostlab/prot_t5_xl_uniref50"  # TODO Huggingface name
         self.class2label_subcell = {
             0: "Cell_membrane",
             1: "Cytoplasm",

@@ -1,8 +1,9 @@
 import dataclasses
-from flask import Blueprint, jsonify
 
-from utils import AvailableModels
+from flask import Blueprint, jsonify
 from biotrainer.protocols import Protocol
+
+from .models import AvailableModels
 
 prediction_metadata_route = Blueprint('prediction_service', __name__)
 
@@ -23,7 +24,7 @@ class ModelMetadata:
 
     def to_dict(self):
         return {
-            "protocol": self.protocol.value(),
+            "protocol": self.protocol.name,
             "description": self.description,
             "authors": self.authors,
             "model_link": self.model_link,
@@ -49,7 +50,7 @@ def get_metadata():
         model_size='',  # onnx in MB
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='ProtT5'
+        embedder='Rostlab/prot_t5_xl_uniref50'
     )
 
     TMbed_metadata = ModelMetadata(
@@ -63,11 +64,11 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='ProtT5'
+        embedder='Rostlab/prot_t5_xl_uniref50'
     )
 
     Conservation_metadata = ModelMetadata(
-        protocol='per-residue',
+        protocol=Protocol.residue_to_class,
         description='',
         authors='C{\'{e}}line Marquet and Michael Heinzinger and Tobias Olenyi and Christian Dallago and Kyra Erckert and Michael Bernhofer and Dmitrii Nechaev and Burkhard Rost',
         model_link='https://github.com/Rostlab/VESPA',
@@ -77,10 +78,10 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='ProtT5'
+        embedder='Rostlab/prot_t5_xl_uniref50'
     )
     SecondaryStructure_metadata = ModelMetadata(
-        protocol='per-residue',
+        protocol=Protocol.residue_to_class,
         description='',
         authors='',
         model_link='https://github.com/agemagician/ProtTrans',
@@ -90,10 +91,10 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='ProtT5'
+        embedder='Rostlab/prot_t5_xl_uniref50'
     )
     BindEmbeDL_metadata = ModelMetadata(
-        protocol='per-residue',
+        protocol=Protocol.residue_to_class,
         description='',
         authors='Littmann, Maria and Heinzinger, Michael and Dallago, Christian and Weissenow, Konstantin and Rost, Burkhard',
         model_link='https://github.com/Rostlab/bindPredict/tree/e9f1f33c5b614966fbf7d85b79f856b68ca495ad',
@@ -103,10 +104,10 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='ProtT5'
+        embedder='Rostlab/prot_t5_xl_uniref50'
     )
     SETH_metadata = ModelMetadata(
-        protocol='per-residue',
+        protocol=Protocol.residue_to_class,
         description='',
         authors='Stärk, Hannes and Dallago, Christian and Heinzinger, Michael and Rost, Burkhard',
         model_link='https://github.com/DagmarIlz/SETH',
@@ -116,10 +117,10 @@ def get_metadata():
         model_size='',
         testset_performance='',
         training_data_link='http://data.bioembeddings.com/public/design/',
-        embedder='ProtT5'
+        embedder='Rostlab/prot_t5_xl_uniref50'  # TODO
     )
     VespaG_metadata = ModelMetadata(
-        protocol='per-residue',  # ?
+        protocol=Protocol.residue_to_class,  # ?
         description='',
         authors='',
         model_link='https://iteragit.iteratec.de/biocentral-at-iteratec/vespag/-/blob/export_onnx/README.md?ref_type=heads',
@@ -132,13 +133,13 @@ def get_metadata():
         embedder='ESM2'
     )
     available_models = {
-        AvailableModels.LightAttention.value(): LightAttention_metadata.to_dict(),
-        AvailableModels.TMbed.value(): TMbed_metadata.to_dict(),
-        AvailableModels.Conservation.value(): Conservation_metadata.to_dict(),
-        AvailableModels.SecondaryStructure.value(): SecondaryStructure_metadata.to_dict(),
-        AvailableModels.BindEmbeDL.value(): BindEmbeDL_metadata.to_dict(),
-        AvailableModels.SETH.value(): SETH_metadata.to_dict(),
-        AvailableModels.VespaG.value(): VespaG_metadata.to_dict(),
+        AvailableModels.LightAttention.name: LightAttention_metadata.to_dict(),
+        AvailableModels.TMbed.name: TMbed_metadata.to_dict(),
+        AvailableModels.Conservation.name: Conservation_metadata.to_dict(),
+        AvailableModels.SecondaryStructure.name: SecondaryStructure_metadata.to_dict(),
+        AvailableModels.BindEmbeDL.name: BindEmbeDL_metadata.to_dict(),
+        AvailableModels.SETH.name: SETH_metadata.to_dict(),
+        AvailableModels.VespaG.name: VespaG_metadata.to_dict(),
     }
 
     return available_models

@@ -1,16 +1,16 @@
 import torch
 import numpy as np
-from scipy.special import softmax
 
-from src.biotrainer.biotrainer.utilities import get_device
-from ..utils import load_onnx_model, to_cpu, AvailableModels, get_batched_data
-from base_model import BaseModel
+from biotrainer.utilities import get_device
+from ..utils import load_onnx_model, to_cpu, get_batched_data
+from .base_model import BaseModel
 
 
 class SETH(BaseModel):
+    name = 'SETH'
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
-        self.model = load_onnx_model(model_name=AvailableModels.SETH.value())
+        self.model = load_onnx_model(model_name=self.name)
         self.device = get_device()
 
     def _prepare_inputs(self, embeddings):
@@ -18,7 +18,7 @@ class SETH(BaseModel):
 
     def predict(self, embeddings):
         inputs = self._prepare_inputs(embeddings=embeddings)
-        embedding_ids = embeddings.keys()
+        embedding_ids = list(embeddings.keys())
         results = []
         for batch in inputs:
             diso_Yhat = self.model.run(None, batch)
@@ -30,5 +30,6 @@ class SETH(BaseModel):
     def _post_process(self, model_output, embedding_ids):
         formatted_predictions = {}
         for i, pred in enumerate(model_output):
-            formatted_predictions[embedding_ids[i]] = [', '.join([str(j) for j in Zscore]) for Zscore in pred]
+            formatted_predictions[embedding_ids[i]] = [', '.join([str(z_score) for z_score in pred])]
+        print(formatted_predictions)  # TODO
         return formatted_predictions

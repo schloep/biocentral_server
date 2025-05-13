@@ -1,7 +1,7 @@
 from typing import Callable
 from biotrainer.protocols import Protocol
 
-from biocentral_server.embeddings import LoadEmbeddingsTask
+from ..embeddings import LoadEmbeddingsTask
 from .models.base_model import BaseModel
 from ..server_management import TaskInterface, TaskDTO
 

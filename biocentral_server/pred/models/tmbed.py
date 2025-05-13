@@ -2,16 +2,18 @@ import torch
 import numpy as np
 from scipy.special import softmax
 
-from src.biotrainer.biotrainer.utilities import get_device
-from ..utils import load_multiple_onnx_models, to_cpu, AvailableModels, get_batched_data
-from base_model import BaseModel
-from tmbed_viterbi import Decoder
+from biotrainer.utilities import get_device
+from ..utils import load_multiple_onnx_models, to_cpu, get_batched_data
+from .base_model import BaseModel
+from .tmbed_viterbi import Decoder
 
 class TMbed(BaseModel):
+    name = 'tmbed' # TODO
+
     def __init__(self, batch_size):
         # TODO: ist das schön mit der batch_size durch super? Pro: wird erzwungen, con: unübersichtlich
         super().__init__(batch_size=batch_size)
-        self.models = load_multiple_onnx_models(model_name=AvailableModels.TMbed.value())
+        self.models = load_multiple_onnx_models(model_name=self.name)
         self.decoder = Decoder()
         self.device = get_device()
         self.pred2label = {0: 'B', 1: 'b', 2: 'H', 3: 'h', 4: 'S', 5: 'i', 6: 'o'}
