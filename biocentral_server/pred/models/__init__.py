@@ -6,14 +6,15 @@ from .light_attention import LightAttention
 from .seth import SETH
 from .bind_predict import BindEmbed
 from .conservation import Conservation
+from .secondary_structure import SecondaryStructure
 
 class AvailableModels(StrEnum):
-    TMbed = 'TMbed'
-    LightAttention = 'LightAttention'
-    Conservation = 'Conservation'
-    SecondaryStructure = 'SecondaryStructure'
-    BindEmbeDL = 'BindEmbeDL'
-    SETH = 'SETH'
+    TMbed = TMbed.name
+    LightAttention = LightAttention.name
+    Conservation = Conservation.name
+    SecondaryStructure = SecondaryStructure.name
+    BindEmbeDL = BindEmbed.name
+    SETH = SETH.name
     VespaG = 'VespaG'
 
 
