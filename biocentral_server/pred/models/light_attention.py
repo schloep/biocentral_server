@@ -35,7 +35,6 @@ class LightAttention(BaseModel):
         return get_batched_data(batch_size=self.batch_size, data=embeddings.values(), mask=True)
 
     def predict(self, embeddings):
-        # TODO: get rid of to_numpy, from numpy...
         inputs = self._prepare_inputs(embeddings=embeddings)
         embedding_ids = embeddings.keys()
         results = []

@@ -11,7 +11,6 @@ class TMbed(BaseModel):
     name = 'TMbed'
 
     def __init__(self, batch_size):
-        # TODO: ist das schön mit der batch_size durch super? Pro: wird erzwungen, con: unübersichtlich
         super().__init__(batch_size=batch_size)
         self.models = load_multiple_onnx_models(model_name=self.name)
         self.decoder = Decoder()
@@ -30,12 +29,11 @@ class TMbed(BaseModel):
             ensemble_container = torch.zeros((B, 5, L), device=self.device, dtype=torch.float32)
             for model in self.models:
                 y = model.run(None, batch)
-                # TODO: hier 'from_numpy' und in 'to_cpu' wieder zu numpy? Funktioniert das auch ohne?
-                # y = torch.from_numpy(np.float32(np.stack(y[0])))
+                # TODO: Possible refactoring: avoid unnecessary casting from numpy to pytorch and vice versa
+                y = torch.from_numpy(np.float32(np.stack(y[0])))
                 ensemble_container = ensemble_container + softmax(np.stack(y[0]), axis=1)
             probabilities = (ensemble_container / len(self.models))
             mem_Yhat = to_cpu(self.decoder(probabilities, batch['mask'])).astype(np.byte)
-            # TODO: test if shape is B x residue_preds (so [[1,0,0,...], [...]])
             results.extend(list(mem_Yhat))  # -> no batches
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 

@@ -24,7 +24,6 @@ class Conservation(BaseModel):
             cons_Yhat = self.model.run(None, batch)
             cons_Yhat = torch.from_numpy(np.float32(np.stack(cons_Yhat[0])))
             cons_Yhat = to_cpu(torch.max( cons_Yhat, dim=-1, keepdim=True )[1]).astype(np.byte)
-            # TODO: test if this should be as in the pgp repo
             results.extend(list(cons_Yhat))
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
     def _post_process(self, model_output, embedding_ids):
