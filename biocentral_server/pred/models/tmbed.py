@@ -5,7 +5,7 @@ from scipy.special import softmax
 from biotrainer.utilities import get_device
 from ..utils import load_multiple_onnx_models, to_cpu, get_batched_data
 from .base_model import BaseModel
-from .tmbed_viterbi import Decoder
+from .additional.tmbed_viterbi import Decoder
 
 class TMbed(BaseModel):
     name = 'TMbed'
