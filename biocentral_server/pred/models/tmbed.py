@@ -8,7 +8,7 @@ from .base_model import BaseModel
 from .tmbed_viterbi import Decoder
 
 class TMbed(BaseModel):
-    name = 'tmbed' # TODO
+    name = 'TMbed'
 
     def __init__(self, batch_size):
         # TODO: ist das schön mit der batch_size durch super? Pro: wird erzwungen, con: unübersichtlich

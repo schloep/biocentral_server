@@ -6,6 +6,7 @@ from .base_model import BaseModel
 
 
 class LightAttention(BaseModel):
+    name = 'LightAttention'
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
         self.la_subcell = load_onnx_model(model_name='la_subcell')
