@@ -133,16 +133,24 @@ def get_metadata():
         embedder='ESM2'
     )
     available_models = {
-        AvailableModels.LightAttention.name: LightAttention_metadata.to_dict(),
-        AvailableModels.TMbed.name: TMbed_metadata.to_dict(),
-        AvailableModels.Conservation.name: Conservation_metadata.to_dict(),
-        AvailableModels.SecondaryStructure.name: SecondaryStructure_metadata.to_dict(),
-        AvailableModels.BindEmbeDL.name: BindEmbeDL_metadata.to_dict(),
-        AvailableModels.SETH.name: SETH_metadata.to_dict(),
-        AvailableModels.VespaG.name: VespaG_metadata.to_dict(),
+        AvailableModels.LightAttention.name: LightAttention_metadata,
+        AvailableModels.TMbed.name: TMbed_metadata,
+        AvailableModels.Conservation.name: Conservation_metadata,
+        AvailableModels.SecondaryStructure.name: SecondaryStructure_metadata,
+        AvailableModels.BindEmbeDL.name: BindEmbeDL_metadata,
+        AvailableModels.SETH.name: SETH_metadata,
+        AvailableModels.VespaG.name: VespaG_metadata,
     }
 
     return available_models
+
+
+def get_metadata_as_dict():
+    available_models = get_metadata()
+    available_models_dicts = {}
+    for model_name, metdata in available_models.items():
+        available_models_dicts[model_name] = metdata.to_dict()
+    return available_models_dicts
 
 
 # Endpoint for ProtSpace dimensionality reduction methods for sequences

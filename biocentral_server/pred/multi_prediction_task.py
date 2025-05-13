@@ -20,9 +20,9 @@ class MultiPredictionTask(TaskInterface):
         for model_name, model_metadata in self.model_data.items():
             model = get_model(model_name=model_name, batch_size=self.batch_size)
             single_pred_task = SinglePredictionTask(model=model,
-                                                    embedder_name=model_metadata["embedder"],  # TODO
+                                                    embedder_name=model_metadata.embedder,
                                                     sequence_input=self.sequence_input,
-                                                    model_protocol=model_metadata["protocol"],
+                                                    model_protocol=model_metadata.protocol,
                                                     device=self.device)
             load_dto = None
             for dto in self.run_subtask(single_pred_task):
