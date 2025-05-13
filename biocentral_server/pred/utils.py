@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 from pathlib import Path
 import onnxruntime as ort
@@ -66,7 +67,7 @@ def get_batched_data(batch_size: int, data: np.array, mask: bool = False) -> lis
     return batched_data
 
 
-def pad_embeddings(embeddings: np.array, get_attention_mask: bool = False) -> Tuple[np.array, np.array | None]:
+def pad_embeddings(embeddings: np.array, get_attention_mask: bool = False):
     """
     Padds the given batch of embeddings to the longest given sequence. Creates the corresponding attention mask if needed.
     :param embeddings: Batch of embeddings to pad

@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # TODO
-import polars as pl # only necessary if you want to use read_mutation_file(), pd would work aswell
-from jaxtyping import Float # only for type hints
+# import polars as pl # only necessary if you want to use read_mutation_file(), pd would work aswell
+# from jaxtyping import Float # only for type hints
 
 
 import rich
@@ -20,8 +20,8 @@ from .score_normalizer import ScoreNormalizer
 GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 AMINO_ACIDS = sorted(GEMME_ALPHABET)
 
-raw_score_cdf = np.loadtxt("data/score_transformation/vespag_scores.csv", delimiter=",")
-sorted_gemme_scores = np.loadtxt("data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
+raw_score_cdf = np.loadtxt("biocentral_server/pred/models/additional/data/score_transformation/vespag_scores.csv", delimiter=",")
+sorted_gemme_scores = np.loadtxt("biocentral_server/pred/models/additional/data/score_transformation/sorted_gemme_scores.csv", delimiter=",")
 
 def transform_scores(scores: np.typing.ArrayLike[float]) -> list[float]:
     """Transform VespaG score distribution by mapping it to a known distribution of GEMME scores through its quantile"""
