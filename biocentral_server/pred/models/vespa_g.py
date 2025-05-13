@@ -41,12 +41,12 @@ class VespaG(BaseModel):
             y = torch.from_numpy(np.float32(np.stack(y[0]))).squeeze(0)
             y = mask_non_mutations(y, embeddings[embedding_ids[i]])
             vespag_scores[id] = y.detach().numpy()
-
-            self.normalizer.fit(np.concatenate([y.flatten() for y in vespag_scores.values()]))
+        self.normalizer.fit(np.concatenate([y.flatten() for y in vespag_scores.values()]))
+        return self._post_process(model_output=vespag_scores, embedding_ids=embedding_ids)
 
     def _post_process(self, model_output, embedding_ids):
         scores_per_protein = {}
-        transform_scores = True
+        transform_scores = True  # default value in the VespaG repo
         for id, y in model_output.items():
             scores_per_protein[id] = {
                 mutation: compute_mutation_score(
@@ -57,5 +57,3 @@ class VespaG(BaseModel):
                 )
                 for mutation in self.mutations_per_protein[id]
             }
-
-
