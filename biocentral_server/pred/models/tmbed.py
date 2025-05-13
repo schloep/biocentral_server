@@ -40,6 +40,5 @@ class TMbed(BaseModel):
     def _post_process(self, model_output, embedding_ids):
         formatted_predictions = {}
         for i, pred in enumerate(model_output):
-            formatted_pred = ''.join([self.pred2label[j] for j in pred])
-            formatted_predictions[embedding_ids[i]]: formatted_pred
+            formatted_predictions[embedding_ids[i]] = ''.join([self.pred2label[j] for j in pred])
         return formatted_predictions

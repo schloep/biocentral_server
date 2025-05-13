@@ -29,6 +29,5 @@ class Conservation(BaseModel):
     def _post_process(self, model_output, embedding_ids):
         formatted_predictions = {}
         for i, pred in enumerate(model_output):
-            formatted_pred = [''.join( [str(j) for j in yhat])for yhat in pred]
-            formatted_predictions[embedding_ids[i]]: formatted_pred
+            formatted_predictions[embedding_ids[i]] = [''.join( [str(j) for j in yhat])for yhat in pred]
         return formatted_predictions
