@@ -1,19 +1,19 @@
 import torch
 import numpy as np
 
-from ..utils import to_cpu, get_batched_data, load_onnx_model
-from .base_model import BaseModel
+from biotrainer.protocols import Protocol
+
+from ..base_model import BaseModel, ModelMetadata
+
+from ...model_utils import to_cpu, get_batched_data, load_onnx_model
 
 
 class LightAttention(BaseModel):
-    name = 'LightAttention'
 
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
         self.la_subcell = load_onnx_model(model_name='la_subcell')
         self.la_mem = load_onnx_model(model_name='la')
-        self.device = ""
-        self.embedder_name = "Rostlab/prot_t5_xl_uniref50"  # TODO Huggingface name
         self.class2label_subcell = {
             0: "Cell_membrane",
             1: "Cytoplasm",
@@ -30,6 +30,23 @@ class LightAttention(BaseModel):
             0: "Membrane",
             1: "Soluble"
         }
+
+    @staticmethod
+    def get_metadata() -> ModelMetadata:
+        return ModelMetadata(
+            name="LightAttention",
+            protocol=Protocol.residues_to_class,
+            description='',
+            authors='Stärk, Hannes and Dallago, Christian and Heinzinger, Michael and Rost, Burkhard',
+            model_link='https://github.com/HannesStark/protein-localization',
+            citation=' https://doi.org/10.1093/bioadv/vbab035',
+            licence='Apache License',
+            description_return_values='',
+            model_size='',  # onnx in MB
+            testset_performance='',
+            training_data_link='http://data.bioembeddings.com/public/design/',
+            embedder='Rostlab/prot_t5_xl_uniref50'
+        )
 
     def _prepare_inputs(self, embeddings):
         return get_batched_data(batch_size=self.batch_size, data=embeddings.values(), mask=True)

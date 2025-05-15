@@ -1,18 +1,20 @@
 import torch
 import numpy as np
 
-from .base_model import BaseModel
-from ..utils import load_onnx_model
-from .additional.score_normalizer import ScoreNormalizer
-from .additional.mutations import compute_mutation_score, mask_non_mutations, SAV
+from biotrainer.protocols import Protocol
+
+from ..base_model import BaseModel, ModelMetadata
+from ...model_utils import load_onnx_model
+
+from ..additional.score_normalizer import ScoreNormalizer
+from ..additional.mutations import compute_mutation_score, mask_non_mutations, SAV
 
 
 class VespaG(BaseModel):
-    name = 'VespaG'
 
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
-        self.model = load_onnx_model(model_name=self.name)
+        self.model = load_onnx_model(model_name=self.get_metadata().name)
         self.GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
         self.AMINO_ACIDS = sorted(self.GEMME_ALPHABET)
         zero_based_mutations = False
@@ -27,6 +29,23 @@ class VespaG(BaseModel):
             for protein_id, sequence in sequences.items()
         }
         self.normalizer = ScoreNormalizer('minmax')
+
+    @staticmethod
+    def get_metadata() -> ModelMetadata:
+        return ModelMetadata(
+            name="VespaG",
+            protocol=Protocol.residue_to_class,  # ?
+            description='',
+            authors='',
+            model_link='https://iteragit.iteratec.de/biocentral-at-iteratec/vespag/-/blob/export_onnx/README.md?ref_type=heads',
+            citation='https://doi.org/10.1093/bioinformatics/btae621',
+            licence='GNU GENERAL PUBLIC LICENSE',
+            description_return_values='',
+            model_size='',
+            testset_performance='',
+            training_data_link='https://zenodo.org/records/11085958',
+            embedder='facebook/esm2_t36_3B_UR50D'
+        )
 
     def _prepare_inputs(self, embeddings):
         return [{'input': embedding.unsqueeze(0).numpy()} for embedding in embeddings.values()]

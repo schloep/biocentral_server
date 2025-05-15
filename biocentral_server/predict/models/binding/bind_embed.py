@@ -1,21 +1,40 @@
 import torch
 import numpy as np
 
-from biotrainer.utilities import get_device
-from ..utils import load_multiple_onnx_models, to_cpu, get_batched_data
-from .base_model import BaseModel
 from torch import nn
+from biotrainer.utilities import get_device
+from biotrainer.protocols import Protocol
+
+from ..base_model import BaseModel, ModelMetadata
+
+from ...model_utils import load_multiple_onnx_models, to_cpu, get_batched_data
 
 
 class BindEmbed(BaseModel):
-    name = "BindEmbed"
 
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
-        self.models = load_multiple_onnx_models(model_name=self.name)
+        self.models = load_multiple_onnx_models(model_name=self.get_metadata().name)
         self.device = get_device()
         self.sigmoid = nn.Sigmoid()
         self.binding_classes = {0: ('metal', "M"), 1: ('nucleic', "N"), 2: ('small', "S")}
+
+    @staticmethod
+    def get_metadata() -> ModelMetadata:
+        return ModelMetadata(
+            name="BindEmbed",
+            protocol=Protocol.residue_to_class,
+            description='',
+            authors='Littmann, Maria and Heinzinger, Michael and Dallago, Christian and Weissenow, Konstantin and Rost, Burkhard',
+            model_link='https://github.com/Rostlab/bindPredict/tree/e9f1f33c5b614966fbf7d85b79f856b68ca495ad',
+            citation='https://doi.org/10.1038/s41598-021-03431-4',
+            licence='Apache License',
+            description_return_values='',
+            model_size='',
+            testset_performance='',
+            training_data_link='http://data.bioembeddings.com/public/design/',
+            embedder='Rostlab/prot_t5_xl_uniref50'
+        )
 
     def _prepare_inputs(self, embeddings):
         embeddings_transposed = {embedding_id: torch.permute(embedding, (0, 2, 1)) for embedding_id, embedding in
@@ -48,5 +67,6 @@ class BindEmbed(BaseModel):
         formatted_predictions = {}
         for idx, (binding_type, bind_short) in self.binding_classes.items():
             for i, pred in enumerate(model_output):
-                formatted_predictions[binding_type][embedding_ids[i]] = ''.join([bind_short if j==1 else "-" for j in pred[:,idx]])
+                formatted_predictions[binding_type][embedding_ids[i]] = ''.join(
+                    [bind_short if j == 1 else "-" for j in pred[:, idx]])
         return formatted_predictions

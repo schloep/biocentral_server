@@ -7,11 +7,10 @@ from ..server_management import TaskInterface, TaskDTO
 
 
 class SinglePredictionTask(TaskInterface):
-    def __init__(self, model: BaseModel, embedder_name, sequence_input, model_protocol, device):
+    def __init__(self, model: BaseModel, sequence_input, device):
         self.model = model
-        self.embedder_name = embedder_name
+        self.model_metadata = model.get_metadata()
         self.sequence_input = sequence_input
-        self.reduced = True if model_protocol in Protocol.using_per_sequence_embeddings() else False
         self.device = device
 
     def run_task(self, update_dto_callback: Callable) -> TaskDTO:
@@ -20,9 +19,10 @@ class SinglePredictionTask(TaskInterface):
         return TaskDTO.finished(result={"predictions": predictions})
 
     def _embed_sequences(self):
-        load_embeddings_task = LoadEmbeddingsTask(embedder_name=self.embedder_name,
+        reduced = True if self.model_metadata.protocol in Protocol.using_per_sequence_embeddings() else False
+        load_embeddings_task = LoadEmbeddingsTask(embedder_name=self.model_metadata.embedder,
                                                   sequence_input=self.sequence_input,
-                                                  reduced=self.reduced,
+                                                  reduced=reduced,
                                                   use_half_precision=False,
                                                   device=self.device)
         load_dto = None

@@ -4,12 +4,12 @@ import onnxruntime as ort
 from pathlib import Path
 from onnxruntime.capi.onnxruntime_pybind11_state import NoSuchFile
 
-MODEL_PATH = "assets/models"
+MODEL_BASE_PATH = "assets/models"
 
 
 def load_multiple_onnx_models(model_name):
     models = []
-    model_dir = f"{MODEL_PATH}/{model_name.str.lower()}"
+    model_dir = f"{MODEL_BASE_PATH}/{model_name.str.lower()}"
     for onnx_file in Path(model_dir).iterdir():
         try:
             onnx_model = ort.InferenceSession(onnx_file)
@@ -21,7 +21,7 @@ def load_multiple_onnx_models(model_name):
 
 
 def load_onnx_model(model_name):
-    model_dir = f"{MODEL_PATH}/{model_name.lower()}/{model_name.lower()}.onnx"  # TODO
+    model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}/{model_name.lower()}.onnx"  # TODO
     return ort.InferenceSession(model_dir)
 
 

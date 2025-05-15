@@ -1,28 +1,25 @@
-from typing import Callable
-
+from typing import Callable, Any
 from biotrainer.utilities import get_device
-from .metadata_endpoint import ModelMetadata
+
+from .models import BaseModel
 from .single_prediction_task import SinglePredictionTask
-from .models import AvailableModels, get_model
 
 from ..server_management import TaskInterface, TaskDTO
 
 
 class MultiPredictionTask(TaskInterface):
-    def __init__(self, model_data: dict[str, ModelMetadata], sequence_input, batch_size):
-        self.model_data = model_data
+    def __init__(self, models: dict[str, Any], sequence_input, batch_size):
+        self.models = models
         self.sequence_input = sequence_input
         self.device = get_device()
         self.batch_size = batch_size
 
     def run_task(self, update_dto_callback: Callable) -> TaskDTO:
         predictions = {}
-        for model_name, model_metadata in self.model_data.items():
-            model = get_model(model_name=model_name, batch_size=self.batch_size)
+        for model_name, model_class in self.models.items():
+            model: BaseModel = model_class(batch_size=self.batch_size)
             single_pred_task = SinglePredictionTask(model=model,
-                                                    embedder_name=model_metadata.embedder,
                                                     sequence_input=self.sequence_input,
-                                                    model_protocol=model_metadata.protocol,
                                                     device=self.device)
             predict_dto = None
             for dto in self.run_subtask(single_pred_task):

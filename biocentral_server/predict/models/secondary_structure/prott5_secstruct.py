@@ -1,18 +1,37 @@
 import torch
 import numpy as np
 
-from .base_model import BaseModel
-from ..utils import load_onnx_model, get_batched_data, to_cpu
+from biotrainer.protocols import Protocol
+
+from ..base_model import BaseModel, ModelMetadata
+
+from ...model_utils import load_onnx_model, get_batched_data, to_cpu
 
 
-class SecondaryStructure(BaseModel):
-    name = 'SecondaryStructure'
+class ProtT5SecondaryStructure(BaseModel):
 
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
-        self.model = load_onnx_model(model_name=self.name)
+        self.model = load_onnx_model(model_name=self.get_metadata().name)
         self.label_mapping_3_states = {0: "H", 1: "E", 2: "L"}
         self.label_mapping_8_states = {idx: state for idx, state in enumerate("GHIBESTC")}
+
+    @staticmethod
+    def get_metadata() -> ModelMetadata:
+        return ModelMetadata(
+            name="ProtT5SecondaryStructure",
+            protocol=Protocol.residue_to_class,
+            description='',
+            authors='',
+            model_link='https://github.com/agemagician/ProtTrans',
+            citation='https://doi.org/10.1109/TPAMI.2021.3095381',
+            licence='Apache License',
+            description_return_values='',
+            model_size='',
+            testset_performance='',
+            training_data_link='http://data.bioembeddings.com/public/design/',
+            embedder='Rostlab/prot_t5_xl_uniref50'
+        )
 
     def _prepare_inputs(self, embeddings):
         return get_batched_data(batch_size=self.batch_size, data=embeddings.values(), mask=False)
