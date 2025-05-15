@@ -24,12 +24,12 @@ class MultiPredictionTask(TaskInterface):
                                                     sequence_input=self.sequence_input,
                                                     model_protocol=model_metadata.protocol,
                                                     device=self.device)
-            load_dto = None
+            predict_dto = None
             for dto in self.run_subtask(single_pred_task):
-                load_dto = dto
-            if not load_dto:
+                predict_dto = dto
+            if not predict_dto:
                 return TaskDTO.failed(error=f"Model prediction with the {model_name} model failed.")
-            single_prediction = load_dto.update["prediction"]
+            single_prediction = predict_dto.update["predictions"]
             predictions[model_name] = single_prediction
 
         return TaskDTO.finished(result={"predictions": predictions})

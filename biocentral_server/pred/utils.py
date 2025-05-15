@@ -1,8 +1,7 @@
-from typing import Union
 import numpy as np
-from pathlib import Path
 import onnxruntime as ort
-from jedi.inference.gradual.typing import Tuple
+
+from pathlib import Path
 from onnxruntime.capi.onnxruntime_pybind11_state import NoSuchFile
 
 MODEL_PATH = "assets/models"

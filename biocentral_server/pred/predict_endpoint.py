@@ -5,7 +5,7 @@ from .metadata_endpoint import get_metadata
 from .multi_prediction_task import MultiPredictionTask
 from ..server_management import TaskManager
 
-prediction_service_route = Blueprint("predict_rout", __name__)  # TODO
+prediction_service_route = Blueprint("prediction_service_predict", __name__)
 
 # Endpoint for ProtSpace dimensionality reduction methods for sequences
 @prediction_service_route.route('/prediction_service/predict', methods=['POST'])

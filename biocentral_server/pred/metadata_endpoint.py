@@ -5,7 +5,7 @@ from biotrainer.protocols import Protocol
 
 from .models import AvailableModels
 
-prediction_metadata_route = Blueprint('prediction_service', __name__)
+prediction_metadata_route = Blueprint('prediction_service_metadata', __name__)
 
 
 @dataclasses.dataclass
@@ -156,4 +156,4 @@ def get_metadata_as_dict():
 # Endpoint for ProtSpace dimensionality reduction methods for sequences
 @prediction_metadata_route.route('/prediction_service/metadata', methods=['GET'])
 def metadata():
-    return jsonify(get_metadata())
+    return jsonify(get_metadata_as_dict())
