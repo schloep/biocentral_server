@@ -1,12 +1,12 @@
 import torch
 import numpy as np
 
+from tmbed import Decoder
 from typing import List, Dict
 from scipy.special import softmax
 from biotrainer.protocols import Protocol
 from biotrainer.utilities import get_device
 
-from ..additional.tmbed_viterbi import Decoder
 from ..base_model import BaseModel, ModelMetadata
 
 from ...model_utils import load_multiple_onnx_models, to_cpu, get_batched_data
