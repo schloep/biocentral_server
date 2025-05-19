@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 
+from typing import List, Dict
 from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata
@@ -13,7 +14,7 @@ class LightAttention(BaseModel):
     def __init__(self, batch_size):
         super().__init__(batch_size=batch_size)
         self.la_subcell = load_onnx_model(model_name='la_subcell')
-        self.la_mem = load_onnx_model(model_name='la')
+        self.la_mem = load_onnx_model(model_name='la_mem')
         self.class2label_subcell = {
             0: "Cell_membrane",
             1: "Cytoplasm",
@@ -51,11 +52,17 @@ class LightAttention(BaseModel):
     def _prepare_inputs(self, embeddings):
         return get_batched_data(batch_size=self.batch_size, data=embeddings.values(), mask=True)
 
-    def predict(self, embeddings):
+    @staticmethod
+    def _transpose_batch(batch):
+        return {k: v.transpose(0, 2, 1) if k == "input" else v for k, v in batch.items()}
+
+    def predict(self, sequences: Dict[str, str], embeddings):
         inputs = self._prepare_inputs(embeddings=embeddings)
-        embedding_ids = embeddings.keys()
+        embedding_ids = list(embeddings.keys())
         results = []
         for batch in inputs:
+            batch = self._transpose_batch(batch)
+
             subcell_Yhat = self.la_subcell.run(None, batch)
             subcell_Yhat = torch.from_numpy(np.float32(np.stack(subcell_Yhat[0])))
             subcell_Yhat = to_cpu(torch.max(subcell_Yhat, dim=1)[1]).astype(np.byte)
@@ -68,7 +75,7 @@ class LightAttention(BaseModel):
             results.extend(batch_result)
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 
-    def _post_process(self, model_output, embedding_ids):
+    def _post_process(self, model_output, embedding_ids: List[str]):
         formatted_predictions = {}
         for i, pred in enumerate(model_output):
             formatted_predictions[embedding_ids[i]] = {

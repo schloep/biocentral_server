@@ -1,3 +1,4 @@
+from typing import List, Dict
 from abc import ABC, abstractmethod
 
 from .model_metadata import ModelMetadata
@@ -18,9 +19,9 @@ class BaseModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def predict(self, embeddings):
+    def predict(self, sequences: Dict[str, str], embeddings):
         raise NotImplementedError
 
     @abstractmethod
-    def _post_process(self, model_output, embedding_ids):
+    def _post_process(self, model_output, embedding_ids: List[str]):
         raise NotImplementedError

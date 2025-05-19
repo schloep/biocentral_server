@@ -1,4 +1,5 @@
 import numpy as np
+import onnx
 import onnxruntime as ort
 
 from pathlib import Path
@@ -7,22 +8,34 @@ from onnxruntime.capi.onnxruntime_pybind11_state import NoSuchFile
 MODEL_BASE_PATH = "assets/models"
 
 
-def load_multiple_onnx_models(model_name):
+def load_multiple_onnx_models(model_name: str):
     models = []
-    model_dir = f"{MODEL_BASE_PATH}/{model_name.str.lower()}"
+    model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}"
     for onnx_file in Path(model_dir).iterdir():
-        try:
-            onnx_model = ort.InferenceSession(onnx_file)
-            models.append(onnx_model)
-        except NoSuchFile:
-            print(f'ERROR: No onnx model at path {onnx_file}.')
-            quit()
+        if ".onnx" in onnx_file.name:
+            try:
+                onnx_model = ort.InferenceSession(onnx_file)
+                models.append(onnx_model)
+            except Exception:
+                raise Exception(f"Model {onnx_file} could not be loaded!")
+
+    if len(models) == 0:
+        raise Exception(f"Model {model_name} could not be loaded!")
+
     return models
 
 
 def load_onnx_model(model_name):
-    model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}/{model_name.lower()}.onnx"  # TODO
-    return ort.InferenceSession(model_dir)
+    model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}"
+    for onnx_file in Path(model_dir).iterdir():
+        if ".onnx" in onnx_file.name:
+            try:
+                onnx_model = ort.InferenceSession(onnx_file)
+                return onnx_model
+            except Exception:
+                raise Exception(f"Model {onnx_file} could not be loaded!")
+
+    raise Exception(f"Model could not be found in model directory {model_dir}!")
 
 
 def to_cpu(tensor):

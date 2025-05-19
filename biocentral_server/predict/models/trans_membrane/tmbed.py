@@ -1,7 +1,8 @@
 import torch
 import numpy as np
-from scipy.special import softmax
 
+from typing import List, Dict
+from scipy.special import softmax
 from biotrainer.protocols import Protocol
 from biotrainer.utilities import get_device
 
@@ -19,6 +20,7 @@ class TMbed(BaseModel):
         self.decoder = Decoder()
         self.device = get_device()
         self.pred2label = {0: 'B', 1: 'b', 2: 'H', 3: 'h', 4: 'S', 5: 'i', 6: 'o'}
+        self.non_padded_embedding_lengths = {}  # Undo padding after predictions
 
     @staticmethod
     def get_metadata() -> ModelMetadata:
@@ -38,15 +40,23 @@ class TMbed(BaseModel):
         )
 
     def _prepare_inputs(self, embeddings):
+        self.non_padded_embedding_lengths = {idx: embedding.shape[0] for idx, embedding in embeddings.items()}
         return get_batched_data(batch_size=self.batch_size, data=embeddings.values(), mask=True)
 
-    def predict(self, embeddings):
+    @staticmethod
+    def _transpose_batch(batch):
+        return {k: v.transpose(0, 2, 1) if k == "input" else v for k, v in batch.items()}
+
+    def predict(self, sequences: Dict[str, str], embeddings):
         inputs = self._prepare_inputs(embeddings=embeddings)
         embedding_ids = embeddings.keys()
         results = []
         for batch in inputs:
             B, L, _ = batch['input'].shape
-            ensemble_container = torch.zeros((B, 5, L), device=self.device, dtype=torch.float32)
+
+            # Container for summing up predictions of individual models in the ensemble
+            ensemble_container = torch.zeros((B, len(self.pred2label.keys()), L), device=self.device,
+                                             dtype=torch.float32)
             for model in self.models:
                 y = model.run(None, batch)
                 # TODO [Refactoring] Avoid unnecessary casting from numpy to pytorch and vice versa
@@ -57,8 +67,10 @@ class TMbed(BaseModel):
             results.extend(list(mem_Yhat))  # -> no batches
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 
-    def _post_process(self, model_output, embedding_ids):
+    def _post_process(self, model_output, embedding_ids: List[str]):
         formatted_predictions = {}
-        for i, pred in enumerate(model_output):
-            formatted_predictions[embedding_ids[i]] = ''.join([self.pred2label[j] for j in pred])
+        for embed_idx, pred in enumerate(model_output):
+            embedding_id = embedding_ids[embed_idx]
+            formatted_predictions[embedding_id] = ''.join([self.pred2label[j] for pred_idx, j in enumerate(pred) if
+                                                           pred_idx < self.non_padded_embedding_lengths[embedding_id]])
         return formatted_predictions

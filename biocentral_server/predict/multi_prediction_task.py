@@ -27,6 +27,7 @@ class MultiPredictionTask(TaskInterface):
             if not predict_dto:
                 return TaskDTO.failed(error=f"Model prediction with the {model_name} model failed.")
             single_prediction = predict_dto.update["predictions"]
+            print(f"{model_name} model prediction: {single_prediction}")
             predictions[model_name] = single_prediction
 
         return TaskDTO.finished(result={"predictions": predictions})

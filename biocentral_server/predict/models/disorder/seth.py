@@ -1,8 +1,9 @@
 import torch
 import numpy as np
 
-from biotrainer.utilities import get_device
+from typing import List, Dict
 from biotrainer.protocols import Protocol
+from biotrainer.utilities import get_device
 
 from ..base_model import BaseModel, ModelMetadata
 
@@ -15,6 +16,7 @@ class SETH(BaseModel):
         super().__init__(batch_size=batch_size)
         self.model = load_onnx_model(model_name=self.get_metadata().name)
         self.device = get_device()
+        self.non_padded_embedding_lengths = {}  # Undo padding after predictions
 
     @staticmethod
     def get_metadata() -> ModelMetadata:
@@ -34,9 +36,10 @@ class SETH(BaseModel):
         )
 
     def _prepare_inputs(self, embeddings):
+        self.non_padded_embedding_lengths = {idx: embedding.shape[0] for idx, embedding in embeddings.items()}
         return get_batched_data(batch_size=self.batch_size, data=embeddings.values(), mask=False)
 
-    def predict(self, embeddings):
+    def predict(self, sequences: Dict[str, str], embeddings):
         inputs = self._prepare_inputs(embeddings=embeddings)
         embedding_ids = list(embeddings.keys())
         results = []
@@ -46,9 +49,11 @@ class SETH(BaseModel):
             results.extend(list(diso_Yhat))
         return self._post_process(model_output=results, embedding_ids=embedding_ids)
 
-    def _post_process(self, model_output, embedding_ids):
+    def _post_process(self, model_output, embedding_ids: List[str]):
         formatted_predictions = {}
-        for i, pred in enumerate(model_output):
-            formatted_predictions[embedding_ids[i]] = [', '.join([str(z_score) for z_score in pred])]
-        print(formatted_predictions)  # TODO
+        for embed_idx, pred in enumerate(model_output):
+            embedding_id = embedding_ids[embed_idx]
+            formatted_predictions[embedding_id] = [', '.join([str(z_score) for pred_idx, z_score in enumerate(pred) if
+                                                              pred_idx < self.non_padded_embedding_lengths[
+                                                                  embedding_id]])]
         return formatted_predictions

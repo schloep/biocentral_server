@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Dict
 from biotrainer.protocols import Protocol
 
 from ..embeddings import LoadEmbeddingsTask
@@ -7,7 +7,7 @@ from ..server_management import TaskInterface, TaskDTO
 
 
 class SinglePredictionTask(TaskInterface):
-    def __init__(self, model: BaseModel, sequence_input, device):
+    def __init__(self, model: BaseModel, sequence_input: Dict[str, str], device):
         self.model = model
         self.model_metadata = model.get_metadata()
         self.sequence_input = sequence_input
@@ -15,7 +15,7 @@ class SinglePredictionTask(TaskInterface):
 
     def run_task(self, update_dto_callback: Callable) -> TaskDTO:
         embeddings = self._embed_sequences()
-        predictions = self.model.predict(embeddings=embeddings)
+        predictions = self.model.predict(sequences=self.sequence_input, embeddings=embeddings)
         return TaskDTO.finished(result={"predictions": predictions})
 
     def _embed_sequences(self):
