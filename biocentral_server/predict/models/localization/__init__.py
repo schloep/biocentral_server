@@ -1,3 +1,3 @@
-from .light_attention import LightAttention
+from .light_attention_subcell import LightAttentionSubcellularLocalization
 
-__all__ = ['LightAttention']
+__all__ = ['LightAttentionSubcellularLocalization']

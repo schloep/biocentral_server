@@ -2,17 +2,18 @@ from typing import Any, Dict, List
 
 from .disorder import SETH
 from .binding import BindEmbed
-from .base_model import BaseModel, ModelMetadata
-from .trans_membrane import TMbed
 from .variant_effect import VespaG
-from .localization import LightAttention
 from .conservation import ProtT5Conservation
+from .base_model import BaseModel, ModelMetadata
+from .membrane import TMbed, LightAttentionMembrane
 from .secondary_structure import ProtT5SecondaryStructure
+from .localization import LightAttentionSubcellularLocalization
 
 
 MODEL_REGISTRY: Dict[str, Any] = {
     TMbed.get_metadata().name: TMbed,
-    LightAttention.get_metadata().name: LightAttention,
+    LightAttentionMembrane.get_metadata().name: LightAttentionMembrane,
+    LightAttentionSubcellularLocalization.get_metadata().name: LightAttentionSubcellularLocalization,
     SETH.get_metadata().name: SETH,
     BindEmbed.get_metadata().name: BindEmbed,
     ProtT5Conservation.get_metadata().name: ProtT5Conservation,
