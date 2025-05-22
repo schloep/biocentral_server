@@ -1,9 +1,7 @@
 import numpy as np
-import onnx
 import onnxruntime as ort
 
 from pathlib import Path
-from onnxruntime.capi.onnxruntime_pybind11_state import NoSuchFile
 
 MODEL_BASE_PATH = "assets/models"
 
@@ -15,13 +13,14 @@ def load_multiple_onnx_models(model_name: str):
         if ".onnx" in onnx_file.name:
             try:
                 onnx_model = ort.InferenceSession(onnx_file)
-                models.append(onnx_model)
+                models.append((onnx_file.name, onnx_model))
             except Exception:
                 raise Exception(f"Model {onnx_file} could not be loaded!")
 
     if len(models) == 0:
         raise Exception(f"Model {model_name} could not be loaded!")
 
+    models = [model[1] for model in sorted(models, key=lambda x: x[0])]
     return models
 
 
