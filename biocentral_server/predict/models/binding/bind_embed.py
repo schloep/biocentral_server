@@ -7,8 +7,6 @@ from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata, Prediction
 
-from ...model_utils import to_cpu
-
 
 class BindEmbed(BaseModel):
 
@@ -55,8 +53,8 @@ class BindEmbed(BaseModel):
             bind_Yhat = ensemble_container / len(self.models)
             # B x 3 x L --> B x L x 3
             bind_Yhat = torch.permute(bind_Yhat, (0, 2, 1))
-            bind_Yhat = to_cpu(bind_Yhat > 0.5).astype(np.byte)
-            results.extend(list(bind_Yhat))
+            bind_Yhat = self._finalize_raw_prediction(bind_Yhat > 0.5, dtype=np.byte)
+            results.extend(bind_Yhat)
         model_output = {"binding": results}
         return self._post_process(model_output=model_output, embedding_ids=embedding_ids)
 

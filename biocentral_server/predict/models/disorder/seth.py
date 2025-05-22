@@ -6,8 +6,6 @@ from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata
 
-from ...model_utils import to_cpu
-
 
 class SETH(BaseModel):
 
@@ -37,7 +35,7 @@ class SETH(BaseModel):
         results = []
         for batch in inputs:
             diso_Yhat = self.model.run(None, batch)
-            diso_Yhat = to_cpu(torch.from_numpy(np.float32(np.stack(diso_Yhat[0]))))
-            results.extend(list(diso_Yhat))
+            diso_Yhat = self._finalize_raw_prediction(torch.from_numpy(np.float32(np.stack(diso_Yhat[0]))))
+            results.extend(diso_Yhat)
         model_output = {"disorder": results}
         return self._post_process(model_output=model_output, embedding_ids=embedding_ids, delimiter=",")

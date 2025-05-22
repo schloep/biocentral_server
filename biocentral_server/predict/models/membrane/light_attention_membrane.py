@@ -6,8 +6,6 @@ from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata
 
-from ...model_utils import to_cpu
-
 
 class LightAttentionMembrane(BaseModel):
 
@@ -45,8 +43,8 @@ class LightAttentionMembrane(BaseModel):
 
             la_mem_Yhat = self.model.run(None, batch)
             la_mem_Yhat = torch.from_numpy(np.float32(np.stack(la_mem_Yhat[0])))
-            la_mem_Yhat = to_cpu(torch.max(la_mem_Yhat, dim=1)[1]).astype(np.byte)
-            results.extend(list(la_mem_Yhat))
+            la_mem_Yhat = self._finalize_raw_prediction(torch.max(la_mem_Yhat, dim=1)[1], dtype=np.byte)
+            results.extend(la_mem_Yhat)
         model_output = {"membrane": results}
         return self._post_process(model_output=model_output, embedding_ids=embedding_ids,
                                   label_maps={"membrane": self.class2label_mem})

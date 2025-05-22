@@ -6,8 +6,6 @@ from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata, Prediction
 
-from ...model_utils import to_cpu
-
 
 class ProtT5Conservation(BaseModel):
 
@@ -38,7 +36,7 @@ class ProtT5Conservation(BaseModel):
         for batch in inputs:
             cons_Yhat = self.model.run(None, batch)
             cons_Yhat = torch.from_numpy(np.float32(np.stack(cons_Yhat[0])))
-            cons_Yhat = to_cpu(torch.max(cons_Yhat, dim=-1, keepdim=True)[1]).astype(np.byte)
-            results.extend(list(cons_Yhat))
+            cons_Yhat = self._finalize_raw_prediction(torch.max(cons_Yhat, dim=-1, keepdim=True)[1], dtype=np.byte)
+            results.extend(cons_Yhat)
         model_output = {"conservation": results}
         return self._post_process(model_output=model_output, embedding_ids=embedding_ids)

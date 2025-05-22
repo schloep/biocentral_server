@@ -6,7 +6,7 @@ from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata
 
-from ...model_utils import to_cpu, get_batched_data, load_onnx_model
+from ...model_utils import get_batched_data, load_onnx_model
 
 
 class LightAttentionSubcellularLocalization(BaseModel):
@@ -53,9 +53,9 @@ class LightAttentionSubcellularLocalization(BaseModel):
 
             subcell_Yhat = self.model.run(None, batch)
             subcell_Yhat = torch.from_numpy(np.float32(np.stack(subcell_Yhat[0])))
-            subcell_Yhat = to_cpu(torch.max(subcell_Yhat, dim=1)[1]).astype(np.byte)
+            subcell_Yhat = self._finalize_raw_prediction(torch.max(subcell_Yhat, dim=1)[1], dtype=np.byte)
 
-            results.extend(list(subcell_Yhat))
+            results.extend(subcell_Yhat)
 
         model_output = {"subcellular_localization": results}
         return self._post_process(model_output=model_output, embedding_ids=embedding_ids,

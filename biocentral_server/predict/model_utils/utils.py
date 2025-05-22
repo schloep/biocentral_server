@@ -37,14 +37,6 @@ def load_onnx_model(model_name):
     raise Exception(f"Model could not be found in model directory {model_dir}!")
 
 
-def to_cpu(tensor):
-    # This function is copied from the PGP-repo to recreate the exact same inference as tested
-    if len(tensor.shape) > 1:
-        return tensor.detach().cpu().squeeze(dim=-1).numpy()
-    else:
-        return tensor.detach().cpu().numpy()
-
-
 def get_batched_data(batch_size: int, data: np.array, mask: bool = False) -> list[dict]:
     """
     Returns the given data in batches. Each batch contains its data as a dict. The structure is enforced by the onnx runtime model.

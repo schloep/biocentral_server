@@ -9,7 +9,7 @@ from biotrainer.utilities import get_device
 from .prediction import Prediction
 from .model_metadata import ModelMetadata
 
-from ...model_utils import load_onnx_model, load_multiple_onnx_models, to_cpu, get_batched_data
+from ...model_utils import load_onnx_model, load_multiple_onnx_models, get_batched_data
 
 
 class BaseModel(ABC):
@@ -79,6 +79,32 @@ class BaseModel(ABC):
         if not self.requires_transpose:
             return batch
         return {k: v.transpose(0, 2, 1) if k == "input" else v for k, v in batch.items()}
+
+    @staticmethod
+    def _finalize_raw_prediction(tensor: torch.tensor, dtype=None) -> List:
+        """
+        Do conversions on the raw onnx model predictions to finalize the model output.
+
+        This includes detach, to cpu, squeezing, numpy, to dtype if provided
+
+        Args:
+            tensor: PyTorch tensor to convert
+            dtype: Optional numpy dtype to convert the array to (e.g., np.byte)
+
+        Returns:
+            Python list on CPU with optional dtype conversion
+        """
+        result = tensor.detach().cpu()
+        if len(tensor.shape) > 1:
+            result = result.squeeze(dim=-1)
+
+        result = result.numpy()
+
+        # Convert to specified dtype if provided
+        if dtype is not None:
+            result = result.astype(dtype)
+
+        return list(result)
 
     @abstractmethod
     def predict(self, sequences: Dict[str, str], embeddings: Dict[str, torch.Tensor]) -> Dict[str, List[Prediction]]:

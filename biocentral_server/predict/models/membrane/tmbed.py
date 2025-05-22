@@ -7,7 +7,6 @@ from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata
 
-from ...model_utils import to_cpu
 
 
 class TMbed(BaseModel):
@@ -49,9 +48,10 @@ class TMbed(BaseModel):
                 pred = pred + torch.softmax(y, dim=1).to(self.device)
 
             probabilities = (pred / len(self.models))
-            # TODO mask device
-            mem_Yhat = to_cpu(self.decoder(probabilities, torch.from_numpy(batch['mask']).to(self.device))).astype(np.byte)
-            results.extend(list(mem_Yhat)) # -> no batches
+            mem_Yhat = self._finalize_raw_prediction(self.decoder(probabilities,
+                                                                  torch.from_numpy(batch['mask']).to(self.device)),
+                                                     dtype=np.byte)
+            results.extend(mem_Yhat) # -> no batches
         model_output = {"trans_membrane": results}
         return self._post_process(model_output=model_output, embedding_ids=embedding_ids,
                                   label_maps={"trans_membrane": self.pred2label})
