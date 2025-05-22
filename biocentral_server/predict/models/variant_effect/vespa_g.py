@@ -3,21 +3,15 @@ import numpy as np
 
 from typing import List, Any, Dict
 from biotrainer.protocols import Protocol
-from vespag import ScoreNormalizer, SAV, compute_mutation_score, mask_non_mutations
+from vespag import ScoreNormalizer, SAV, compute_mutation_score, mask_non_mutations, generate_protein_mutations
 
 from ..base_model import BaseModel, ModelMetadata, Prediction, MutationPrediction
-
-from ...model_utils import load_onnx_model
-
 
 class VespaG(BaseModel):
 
     def __init__(self, batch_size):
-        super().__init__(batch_size=batch_size)
-        self.model = load_onnx_model(model_name=self.get_metadata().name)
-        self.GEMME_ALPHABET = "ACDEFGHIKLMNPQRSTVWY"  # TODO Should be imported from VespaG
-        self.AMINO_ACIDS = sorted(self.GEMME_ALPHABET)
-        self.zero_based_mutations = False
+        super().__init__(batch_size=batch_size, uses_ensemble=False, requires_mask=False, requires_transpose=False)
+        self.zero_based_mutations = False  # VespaG default
         self.mutations_per_protein = {}  # Calculated during predict
         self.normalizer = ScoreNormalizer('minmax')
         self.prediction_name = "variant_effect"
@@ -47,15 +41,9 @@ class VespaG(BaseModel):
     def predict(self, sequences: Dict[str, str], embeddings):
         inputs = self._prepare_inputs(embeddings=embeddings)
         embedding_ids = list(embeddings.keys())
-        self.mutations_per_protein = {  # TODO Should be handled in VespaG
-            protein_id: [
-                SAV(i, wildtype_aa, other_aa, not self.zero_based_mutations)
-                for i, wildtype_aa in enumerate(sequence)
-                for other_aa in self.AMINO_ACIDS
-                if other_aa != wildtype_aa
-            ]
-            for protein_id, sequence in sequences.items()
-        }
+        self.mutations_per_protein = generate_protein_mutations(sequences=sequences,
+                                                                zero_based_mutations=self.zero_based_mutations,
+                                                                tqdm=False)
         vespag_scores = {}
         for seq_idx, sequence_embedding in enumerate(inputs):
             seq_id = embedding_ids[seq_idx]
