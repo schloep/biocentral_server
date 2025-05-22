@@ -1,40 +1,6 @@
 import numpy as np
-import onnxruntime as ort
 
-from pathlib import Path
-
-MODEL_BASE_PATH = "assets/models"
-
-
-def load_multiple_onnx_models(model_name: str):
-    models = []
-    model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}"
-    for onnx_file in Path(model_dir).iterdir():
-        if ".onnx" in onnx_file.name:
-            try:
-                onnx_model = ort.InferenceSession(onnx_file)
-                models.append((onnx_file.name, onnx_model))
-            except Exception:
-                raise Exception(f"Model {onnx_file} could not be loaded!")
-
-    if len(models) == 0:
-        raise Exception(f"Model {model_name} could not be loaded!")
-
-    models = [model[1] for model in sorted(models, key=lambda x: x[0])]
-    return models
-
-
-def load_onnx_model(model_name):
-    model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}"
-    for onnx_file in Path(model_dir).iterdir():
-        if ".onnx" in onnx_file.name:
-            try:
-                onnx_model = ort.InferenceSession(onnx_file)
-                return onnx_model
-            except Exception:
-                raise Exception(f"Model {onnx_file} could not be loaded!")
-
-    raise Exception(f"Model could not be found in model directory {model_dir}!")
+MODEL_BASE_PATH = "PREDICT"
 
 
 def get_batched_data(batch_size: int, data: np.array, mask: bool = False) -> list[dict]:

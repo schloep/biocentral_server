@@ -1,15 +1,18 @@
 import torch
 import numpy as np
+import onnxruntime as ort
 
 from abc import ABC, abstractmethod
+from onnxruntime import InferenceSession
 from biotrainer.protocols import Protocol
 from typing import List, Dict, Union, Any
 from biotrainer.utilities import get_device
 
+from biocentral_server.server_management import FileContextManager
 from .prediction import Prediction
 from .model_metadata import ModelMetadata
 
-from ...model_utils import load_onnx_model, load_multiple_onnx_models, get_batched_data
+from ...model_utils import get_batched_data, MODEL_BASE_PATH
 
 
 class BaseModel(ABC):
@@ -39,9 +42,44 @@ class BaseModel(ABC):
         # Load model(s)
         model_name = model_dir_name if model_dir_name else self.get_metadata().name
         if uses_ensemble:
-            self.models = load_multiple_onnx_models(model_name=model_name)
+            self.models = self._load_multiple_onnx_models(model_name=model_name)
         else:
-            self.model = load_onnx_model(model_name=model_name)
+            self.model = self._load_onnx_model(model_name=model_name)
+
+    @staticmethod
+    def _load_onnx_model(model_name: str) -> InferenceSession:
+        file_context_manager = FileContextManager()
+        model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}"
+
+        with file_context_manager.storage_dir_read(dir_path=model_dir) as onnx_path:
+            for onnx_file in onnx_path.iterdir():
+                try:
+                    onnx_model = ort.InferenceSession(onnx_file)
+                    return onnx_model
+                except Exception:
+                    raise Exception(f"Model {onnx_file} could not be loaded!")
+
+        raise Exception(f"Model could not be found in model directory {model_dir}!")
+
+    @staticmethod
+    def _load_multiple_onnx_models(model_name: str) -> List[InferenceSession]:
+        file_context_manager = FileContextManager()
+        model_dir = f"{MODEL_BASE_PATH}/{model_name.lower()}"
+        models = []
+        with file_context_manager.storage_dir_read(dir_path=model_dir) as onnx_path:
+            for onnx_file in onnx_path.iterdir():
+                try:
+                    onnx_model = ort.InferenceSession(onnx_file)
+                    models.append((onnx_file.name, onnx_model))
+                except Exception:
+                    raise Exception(f"Model {onnx_file} could not be loaded!")
+
+        if len(models) == 0:
+            raise Exception(f"Model {model_name} could not be loaded!")
+
+        # TODO [Refactoring] Sorting for cv_index does not work with temp files
+        models = [model[1] for model in sorted(models, key=lambda x: x[0])]
+        return models
 
     @staticmethod
     @abstractmethod

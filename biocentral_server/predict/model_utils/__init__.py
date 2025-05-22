@@ -1,9 +1,7 @@
-from .utils import MODEL_BASE_PATH, load_multiple_onnx_models, load_onnx_model, get_batched_data, pad_embeddings
+from .utils import MODEL_BASE_PATH, get_batched_data, pad_embeddings
 
 __all__ = [
     "MODEL_BASE_PATH",
-    "load_multiple_onnx_models",
-    "load_onnx_model",
     "get_batched_data",
     "pad_embeddings"
 ]

@@ -2,6 +2,8 @@ import logging
 
 from ..server_management import ServerModuleInitializer, FileContextManager, FileManager
 
+from .model_utils import MODEL_BASE_PATH
+
 logger = logging.getLogger(__name__)
 
 
@@ -10,10 +12,9 @@ class PredictInitializer(ServerModuleInitializer):
     DOWNLOAD_URLS = ["https://nextcloud.in.tum.de/index.php/s/kxJ64RcRi7g6p6r/download"]
 
     def __init__(self):
-        self.predict_server_path = "PREDICT"
+        self.predict_server_path = MODEL_BASE_PATH
         self.file_context_manager = FileContextManager()
         self.file_manager = FileManager(user_id=self.predict_server_path)
-
 
     def check_one_time_setup_is_done(self) -> bool:
         return self.file_manager.check_base_dir_exists()

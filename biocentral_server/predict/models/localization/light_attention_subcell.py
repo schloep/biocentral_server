@@ -1,12 +1,10 @@
 import torch
 import numpy as np
 
-from typing import List, Dict
+from typing import Dict
 from biotrainer.protocols import Protocol
 
 from ..base_model import BaseModel, ModelMetadata
-
-from ...model_utils import get_batched_data, load_onnx_model
 
 
 class LightAttentionSubcellularLocalization(BaseModel):
