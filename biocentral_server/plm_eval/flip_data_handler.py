@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 class FLIPDataHandler:
     """Handles FLIP dataset operations with clear separation between path management and data processing"""
 
-    DOWNLOAD_FILE_NAME = "all_fastas"
-    DOWNLOAD_URLS = [f"http://data.bioembeddings.com/public/FLIP/fasta/{DOWNLOAD_FILE_NAME}.zip"]
+    DOWNLOAD_URLS = ["http://data.bioembeddings.com/public/FLIP/fasta/all_fastas.zip",
+                     "https://nextcloud.in.tum.de/index.php/s/2Xipt5WaAxnrCKH/download"]
     IGNORE_SPLITS = ["mixed_vs_human_2"]
     MIN_SEQ_SIZE = 0
     MAX_SEQ_SIZE = 2000
