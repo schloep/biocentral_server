@@ -37,13 +37,14 @@ class VespaG(BaseModel):
             model_size='2.6 MB',
             testset_performance='',
             training_data_link='https://zenodo.org/records/11085958',
-            embedder="facebook/esm2_t33_650M_UR50D"  # 'facebook/esm2_t36_3B_UR50D'
+            embedder="facebook/esm2_t36_3B_UR50D"  # Smaller model for testing: facebook/esm2_t33_650M_UR50D
         )
 
     def _prepare_inputs(self, embeddings):
-        # return [{'input': embedding.unsqueeze(0).numpy()} for embedding in embeddings.values()] TODO ESM LARGE
-        return [{'input': torch.repeat_interleave(embedding, 2, dim=-1).unsqueeze(0).numpy()}
-                for embedding in embeddings.values()]
+        # return [{'input': torch.repeat_interleave(embedding, 2, dim=-1).unsqueeze(0).numpy()}
+        #                 for embedding in embeddings.values()]  # For testing with smaller esm2_t33_650M_UR50D model
+        return [{'input': embedding.unsqueeze(0).numpy()} for embedding in embeddings.values()]
+
 
     def predict(self, sequences: Dict[str, str], embeddings):
         inputs = self._prepare_inputs(embeddings=embeddings)
