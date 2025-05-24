@@ -5,7 +5,7 @@ from typing import List, Any, Dict
 from biotrainer.protocols import Protocol
 from vespag import ScoreNormalizer, SAV, compute_mutation_score, mask_non_mutations, generate_protein_mutations
 
-from ..base_model import BaseModel, ModelMetadata, Prediction, MutationPrediction
+from ..base_model import BaseModel, ModelMetadata, Prediction, MutationPrediction, ModelOutput, OutputClass, OutputType
 
 class VespaG(BaseModel):
 
@@ -21,13 +21,20 @@ class VespaG(BaseModel):
         return ModelMetadata(
             name="VespaG",
             protocol=Protocol.residue_to_class,  # TODO residue_to_value / mutation
-            description='',
-            authors='',
-            model_link='https://iteragit.iteratec.de/biocentral-at-iteratec/vespag/-/blob/export_onnx/README.md?ref_type=heads',
+            description='Single amino acid variant effect prediction based on VESPA and GEMME models',
+            authors='Céline Marquet, Julius Schlensok, Marina Abakarova, Burkhard Rost, Elodie Laine',
+            model_link='https://github.com/JSchlensok/VespaG',
             citation='https://doi.org/10.1093/bioinformatics/btae621',
-            licence='GNU GENERAL PUBLIC LICENSE',
-            description_return_values='',
-            model_size='',
+            licence='GPL-3.0',
+            outputs=[ModelOutput(name="variant_effect", 
+                                description="Prediction of the effect of amino acid mutations on protein function",
+                                output_type=OutputType.MUTATION,
+                                value_type=float,
+                                # Scores are normalized between 0 and 1
+                                value_range=(0.0, 1.0),
+                                unit="score")
+                    ],
+            model_size='2.6 MB',
             testset_performance='',
             training_data_link='https://zenodo.org/records/11085958',
             embedder="facebook/esm2_t33_650M_UR50D"  # 'facebook/esm2_t36_3B_UR50D'

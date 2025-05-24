@@ -5,7 +5,7 @@ from torch import nn
 from typing import List, Any, Dict
 from biotrainer.protocols import Protocol
 
-from ..base_model import BaseModel, ModelMetadata, Prediction
+from ..base_model import BaseModel, ModelMetadata, Prediction, ModelOutput, OutputClass, OutputType
 
 
 class BindEmbed(BaseModel):
@@ -20,13 +20,40 @@ class BindEmbed(BaseModel):
         return ModelMetadata(
             name="BindEmbed",
             protocol=Protocol.residue_to_class,
-            description='',
+            description='bindEmbed21DL - Binding residue prediction for various ligand classes',
             authors='Littmann, Maria and Heinzinger, Michael and Dallago, Christian and Weissenow, Konstantin and Rost, Burkhard',
-            model_link='https://github.com/Rostlab/bindPredict/tree/e9f1f33c5b614966fbf7d85b79f856b68ca495ad',
+            model_link='https://github.com/Rostlab/bindPredict',
             citation='https://doi.org/10.1038/s41598-021-03431-4',
-            licence='Apache License',
-            description_return_values='',
-            model_size='',
+            licence='MIT',
+            outputs=[ModelOutput(name="metal", description="Per-residue binding affinity for metal",
+                                 output_type=OutputType.PER_RESIDUE,
+                                 value_type=str,
+                                 classes={
+                                     "M": OutputClass(label="Metal affinity", description="Residue binds to metal"),
+                                     "-": OutputClass(label="No metal affinity",
+                                                      description="Residue does not bind to metal")
+                                 },
+                                 ),
+                     ModelOutput(name="nucleic", description="Per-residue binding affinity for nucleic acids",
+                                 output_type=OutputType.PER_RESIDUE,
+                                 value_type=str,
+                                 classes={
+                                     "N": OutputClass(label="Nucleic affinity",
+                                                      description="Residue binds to nucleic acids"),
+                                     "-": OutputClass(label="No nucleic affinity",
+                                                      description="Residue does not bind to nucleic acids")
+                                 }),
+                     ModelOutput(name="small", description="Per-residue binding affinity for small organic molecules",
+                                 output_type=OutputType.PER_RESIDUE,
+                                 value_type=str,
+                                 classes={
+                                     "S": OutputClass(label="Small molecules affinity",
+                                                      description="Residue binds to small organic molecules"),
+                                     "-": OutputClass(label="No small molecules affinity",
+                                                      description="Residue does not bind to small organic molecules")
+                                 })
+                     ],
+            model_size='2.6 MB',
             testset_performance='',
             training_data_link='http://data.bioembeddings.com/public/design/',
             embedder='Rostlab/prot_t5_xl_uniref50'

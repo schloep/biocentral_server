@@ -4,7 +4,7 @@ import numpy as np
 from typing import Dict
 from biotrainer.protocols import Protocol
 
-from ..base_model import BaseModel, ModelMetadata
+from ..base_model import BaseModel, ModelMetadata, Prediction, ModelOutput, OutputClass, OutputType
 
 
 class LightAttentionMembrane(BaseModel):
@@ -22,12 +22,24 @@ class LightAttentionMembrane(BaseModel):
         return ModelMetadata(
             name="LightAttentionMembrane",
             protocol=Protocol.residues_to_class,
-            description='',
+            description='Prediction of protein membrane association',
             authors='Stärk, Hannes and Dallago, Christian and Heinzinger, Michael and Rost, Burkhard',
             model_link='https://github.com/HannesStark/protein-localization',
             citation=' https://doi.org/10.1093/bioadv/vbab035',
-            licence='Apache License',
-            description_return_values='',
+            licence='MIT',
+            outputs=[ModelOutput(name="membrane", 
+                                description="Protein membrane association",
+                                output_type=OutputType.PER_SEQUENCE,
+                                value_type=str,
+                                classes={
+                                    "Membrane": OutputClass(
+                                        label="Membrane", 
+                                        description="Protein is associated with membranes"),
+                                    "Soluble": OutputClass(
+                                        label="Soluble", 
+                                        description="Protein is soluble and not membrane-associated")
+                                })
+                    ],
             model_size='',  # onnx in MB
             testset_performance='',
             training_data_link='http://data.bioembeddings.com/public/design/',

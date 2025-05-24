@@ -4,7 +4,7 @@ import numpy as np
 from typing import List, Dict
 from biotrainer.protocols import Protocol
 
-from ..base_model import BaseModel, ModelMetadata
+from ..base_model import BaseModel, ModelMetadata, Prediction, ModelOutput, OutputClass, OutputType
 
 
 class ProtT5SecondaryStructure(BaseModel):
@@ -19,13 +19,48 @@ class ProtT5SecondaryStructure(BaseModel):
         return ModelMetadata(
             name="ProtT5SecondaryStructure",
             protocol=Protocol.residue_to_class,
-            description='',
-            authors='',
+            description='ProtT5 secondary structure prediction',
+            authors='Elnaggar, Ahmed and Heinzinger, Michael and Dallago, Christian and Rehawi, Ghalia and Yu, Wang and Jones, Llion and Gibbs, Tom and Feher, Tamas and Angerer, Christoph and Steinegger, Martin and Bhowmik, Debsindhu and Rost, Burkhard',
             model_link='https://github.com/agemagician/ProtTrans',
             citation='https://doi.org/10.1109/TPAMI.2021.3095381',
-            licence='Apache License',
-            description_return_values='',
-            model_size='',
+            licence='MIT',
+            outputs=[
+                ModelOutput(name="d3_Yhat", 
+                           description="3-state secondary structure prediction",
+                           output_type=OutputType.PER_RESIDUE,
+                           value_type=str,
+                           classes={
+                               "H": OutputClass(label="Helix", 
+                                               description="Residue is part of an alpha helix"),
+                               "E": OutputClass(label="Sheet",
+                                               description="Residue is part of a beta sheet"),
+                               "L": OutputClass(label="Other",
+                                               description="Residue is part of a loop or coil")
+                           }),
+                ModelOutput(name="d8_Yhat", 
+                           description="8-state DSSP secondary structure prediction",
+                           output_type=OutputType.PER_RESIDUE,
+                           value_type=str,
+                           classes={
+                               "G": OutputClass(label="3-10 Helix", 
+                                               description="Residue is part of a 3-10 helix"),
+                               "H": OutputClass(label="Alpha Helix", 
+                                               description="Residue is part of an alpha helix"),
+                               "I": OutputClass(label="Pi Helix", 
+                                               description="Residue is part of a pi helix"),
+                               "B": OutputClass(label="Beta Bridge", 
+                                               description="Residue is part of an isolated beta bridge"),
+                               "E": OutputClass(label="Extended Strand", 
+                                               description="Residue is part of an extended strand in a beta ladder"),
+                               "S": OutputClass(label="Bend", 
+                                               description="Residue is part of a bend"),
+                               "T": OutputClass(label="Turn", 
+                                               description="Residue is part of a hydrogen-bonded turn"),
+                               "C": OutputClass(label="Coil", 
+                                               description="Residue is part of a coil (none of the above)")
+                           })
+            ],
+            model_size='929.0 KB',
             testset_performance='',
             training_data_link='http://data.bioembeddings.com/public/design/',
             embedder='Rostlab/prot_t5_xl_uniref50'

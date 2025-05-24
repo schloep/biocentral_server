@@ -5,7 +5,7 @@ from tmbed import Decoder
 from typing import List, Dict
 from biotrainer.protocols import Protocol
 
-from ..base_model import BaseModel, ModelMetadata
+from ..base_model import BaseModel, ModelMetadata, Prediction, ModelOutput, OutputClass, OutputType
 
 
 
@@ -21,13 +21,37 @@ class TMbed(BaseModel):
         return ModelMetadata(
             name="TMbed",
             protocol=Protocol.residue_to_class,
-            description='',
+            description='Prediction of transmembrane proteins',
             authors='Bernhofer, Michael and Rost, Burkhard',
             model_link='https://github.com/BernhoferM/TMbed',
-            citation='https://doi.org/10.1101/2022.06.12.495804',
-            licence='Apache License',
-            description_return_values='',
-            model_size='',
+            citation='https://doi.org/10.1186/s12859-022-04873-x',
+            licence='Apache-2.0',
+            outputs=[ModelOutput(name="trans_membrane", 
+                                description="Per-residue transmembrane topology prediction",
+                                output_type=OutputType.PER_RESIDUE,
+                                value_type=str,
+                                classes={
+                                    "B": OutputClass(label="Transmembrane beta strand",
+                                                    description="Residue is part of a transmembrane beta strand "
+                                                                "(IN-->OUT orientation)"),
+                                    "b": OutputClass(label="Transmembrane beta strand",
+                                                    description="Residue is part of a transmembrane beta strand "
+                                                                "(OUT-->IN orientation)"),
+                                    "H": OutputClass(label="Transmembrane alpha helix",
+                                                    description="Residue is part of a transmembrane helix "
+                                                                "(IN-->OUT orientation)"),
+                                    "h": OutputClass(label="Transmembrane alpha helix",
+                                                    description="Residue is part of a transmembrane helix "
+                                                                "(OUT-->IN orientation)"),
+                                    "S": OutputClass(label="Signal peptide", 
+                                                    description="Residue is part of a signal peptide"),
+                                    "i": OutputClass(label="Non-Transmembrane, inside",
+                                                    description="Residue is on the inside (cytoplasmic) side"),
+                                    "o": OutputClass(label="Non-Transmembrane, outside",
+                                                    description="Residue is on the outside (extracellular) side")
+                                })
+                    ],
+            model_size='1.4 MB',
             testset_performance='',
             training_data_link='http://data.bioembeddings.com/public/design/',
             embedder='Rostlab/prot_t5_xl_uniref50'
